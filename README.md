@@ -3,9 +3,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Pull a whole Dropbox account down to a local or external drive, in parallel, with adaptive rate limiting, a live progress display, automatic dependency folder filtering, and Dropbox content-hash verification.
+Pull a large Dropbox folder down to a local or external drive, in parallel, with adaptive rate limiting, a live progress display, automatic dependency folder filtering, and Dropbox content-hash verification.
 
-Not a backup tool: there is no version history and no schedule. It is a resumable bulk download, which is what the name says.
+Not a backup tool: there is no version history and no schedule. It is a resumable bulk downloader, designed to facilitate moving large folders. The project has been forked from [Mikheil Kuzmidi's project.](https://github.com/mikheilkuzmidi/dbxpull)
 
 ![The tail and summary of a sample-file demo](docs/dbxpull.gif)
 
@@ -25,10 +25,17 @@ This recording is a controlled demo of an earlier version using sample files and
 ## Installation
 
 ```bash
-git clone https://github.com/mikheilkuzmidi/dbxpull.git
+git clone https://github.com/mpec-vrtalbot/dbxpull.git
 cd dbxpull
+
+# Linux/Mac
 python3 -m venv venv
 source venv/bin/activate
+
+# Windows
+python -m venv .venv
+.venv/Scripts/activate
+
 pip install -e .
 ```
 

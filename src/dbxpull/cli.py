@@ -151,6 +151,9 @@ def validate_and_connect(config: Config) -> "dropbox.Dropbox":
 
         account = dbx.users_get_current_account()
         print_success(f"Connected: {account.name.display_name} ({account.email})")
+        # Adjust to access team folder as well as individual ccount 
+        root_namespace_id = account.root_info.root_namespace_id
+        dbx = dbx.with_path_root(dropbox.common.PathRoot.root(root_namespace_id))
 
         # Show storage usage
         try:

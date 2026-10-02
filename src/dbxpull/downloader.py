@@ -24,14 +24,12 @@ from .utils import exponential_backoff_with_jitter, human_size
 logger = logging.getLogger(__name__)
 
 
-def destination_path(root: Path, remote_path: str) -> Path:
-    """Reject paths or existing symlinks that could write outside the destination."""
-    parts = remote_path.removeprefix("/").split("/")
-    if any(part in ("", ".", "..") or "\\" in part or ":" in part for part in parts):
-        raise ValueError(f"Unsafe destination path: {remote_path}")
-    dest = root.joinpath(*parts)
+def destination_path(root: Path, remote_path: str, remote_parent: str) -> Path:
+    """Adjust paths to avoid heavy nesting of folders - e.g., copy Dropbox /MPEC/project/analysis folder contents to local root\\analysis folder """
+    _,_, rel_path = remote_path.partition(remote_parent)
+    dest = Path(f"{root}{rel_path}")
     if not dest.resolve().is_relative_to(root.resolve()):
-        raise ValueError(f"Destination escapes root: {remote_path}")
+        raise ValueError(f"\nDestination escapes root: Remote {remote_path}\nLocal {dest}")
     return dest
 
 
@@ -180,7 +178,7 @@ def run_backup(
         nonlocal reserved_bytes
         if stop_event.is_set():
             return entry, "skip"
-        dest = destination_path(dest_root, entry.path_display)
+        dest = destination_path(dest_root, entry.path_display, config.root_path)
         require_content_hash(entry.content_hash)
         if dest.exists():
             try:
