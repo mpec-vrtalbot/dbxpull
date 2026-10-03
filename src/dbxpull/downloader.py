@@ -25,13 +25,13 @@ logger = logging.getLogger(__name__)
 
 
 def destination_path(root: Path, remote_path: str, remote_parent: str) -> Path:
-    """Adjust paths to avoid heavy nesting of folders - e.g., copy Dropbox /MPEC/project/analysis folder contents to local root\\analysis folder """
+    """Adjust paths to avoid heavy nesting of folders and excessive path lengths - e.g., copy Dropbox /MPEC/project/analysis folder contents to local root\\analysis folder """
     _,_, rel_path = remote_path.partition(remote_parent)
-    dest = Path(f"{root}{rel_path}")
-    if not dest.resolve().is_relative_to(root.resolve()):
-        raise ValueError(f"\nDestination escapes root: Remote {remote_path}\nLocal {dest}")
+    dest_str = f"{root}{rel_path}"
+    dest = Path(dest_str)
+    if len(dest_str) > 218:
+        logger.warning("Local file path exceeds 218 characters: %s may become corrupted or inaccessible. Consider renaming.", dest)
     return dest
-
 
 class Downloader:
     """Download, read back and verify a file before replacing its destination."""
