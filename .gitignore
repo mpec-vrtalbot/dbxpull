@@ -113,6 +113,8 @@ Desktop.ini
 *.log
 logs/
 log/
+*.txt
+*.csv
 
 # Local development
 .env.local

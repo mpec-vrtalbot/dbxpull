@@ -78,6 +78,7 @@ class Config:
 
     # Dropbox path settings
     root_path: str = ""
+    file_list: str = ""
 
     # Local settings
     dest_root: str = ""
@@ -120,6 +121,7 @@ class Config:
             access_token=os.getenv("DROPBOX_ACCESS_TOKEN", ""),
             # Other settings
             root_path=os.getenv("DROPBOX_ROOT_PATH", ""),
+            file_list=os.getenv("DROPBOX_FILE_LIST", ""),
             dest_root=os.getenv("DROPBOX_BACKUP_DEST", ""),
             max_gb_per_run=float(os.getenv("DROPBOX_MAX_GB_PER_RUN", "0")),
             max_concurrent_downloads=int(os.getenv("DROPBOX_CONCURRENT_DOWNLOADS", "6")),

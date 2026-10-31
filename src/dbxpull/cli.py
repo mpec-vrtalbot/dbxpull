@@ -5,6 +5,7 @@ import logging
 import shutil
 import signal
 import sys
+from datetime import datetime
 from pathlib import Path
 from threading import Event
 from typing import TYPE_CHECKING, Any
@@ -151,7 +152,7 @@ def validate_and_connect(config: Config) -> "dropbox.Dropbox":
 
         account = dbx.users_get_current_account()
         print_success(f"Connected: {account.name.display_name} ({account.email})")
-        # Adjust to access team folder as well as individual ccount 
+        # Adjust to access team folder as well as individual account 
         root_namespace_id = account.root_info.root_namespace_id
         dbx = dbx.with_path_root(dropbox.common.PathRoot.root(root_namespace_id))
 
@@ -327,7 +328,7 @@ def main(config: Config | None = None) -> int:
 
     try:
         # Set up logging
-        log_file = Path.cwd() / "dbxpull.log"
+        log_file = Path.cwd() / f"dbxpull-{datetime.now().strftime("%Y%m%d-%H%M%S")}.log"
         setup_logging(log_file)
         logger.info("=" * 50)
         logger.info("Backup started")
@@ -351,9 +352,14 @@ def main(config: Config | None = None) -> int:
             return 0
 
         # Scan Dropbox
-        print_header("Scanning")
+        print_header("Scanning")   
         try:
-            files, _, _ = scan_dropbox(dbx, config.root_path, filters, config, stop_event)
+            if config.file_list != "":
+                with open(config.file_list, 'r') as f:
+                    file_list = f.read().splitlines()
+                files = [dbx.files_get_metadata(i) for i in file_list if i != ""]
+            else:
+                files, _, _ = scan_dropbox(dbx, config.root_path, filters, config, stop_event)
         except InterruptedError:
             print_warning("Scan interrupted. Run again to continue.")
             return 130
