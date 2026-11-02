@@ -5,7 +5,7 @@ import logging
 import shutil
 import signal
 import sys
-from datetime import datetime
+import os
 from pathlib import Path
 from threading import Event
 from typing import TYPE_CHECKING, Any
@@ -328,7 +328,7 @@ def main(config: Config | None = None) -> int:
 
     try:
         # Set up logging
-        log_file = Path.cwd() / f"dbxpull-{datetime.now().strftime("%Y%m%d-%H%M%S")}.log"
+        log_file = Path.cwd() / f"{os.path.basename(config.root_path)}.log"
         setup_logging(log_file)
         logger.info("=" * 50)
         logger.info("Backup started")

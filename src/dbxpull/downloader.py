@@ -115,8 +115,8 @@ class Downloader:
                         self.stats.increment("rate_limit_hits")
                         self.limiter.record_rate_limit()
                     if attempt == self.config.max_retries - 1:
-                        logger.error("Failed to download %s after %d attempts: %s",
-                                     entry.path_display, self.config.max_retries, error)
+                        logger.error("Failed to download %s |ID %s| after %d attempts: %s",
+                                     entry.path_display, entry.id, self.config.max_retries, error)
                         return False
                     self.stats.increment("retries_total")
                     wait_time = exponential_backoff_with_jitter(
