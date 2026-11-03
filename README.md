@@ -24,18 +24,26 @@ This recording is a controlled demo of an earlier version using sample files and
 
 ## Installation
 
+### 1. Clone or download the repository and navigate to the directory
 ```bash
-git clone https://github.com/mpec-vrtalbot/dbxpull.git
+git clone https://github.com/mpec-vrtalbot/dbxpull.git  # You can also download it as a zipped folder from this website
 cd dbxpull
-
-# Linux/Mac
+```
+### 2. Create and activate a virtual environment
+#### Linux/Mac
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 
-# Windows
+#### Windows
+```bash
 python -m venv .venv
 .venv/Scripts/activate
+```
 
+### 3. Finish up by installing dependencies in the activated environment
+```bash
 pip install -e .
 ```
 
