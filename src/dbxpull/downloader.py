@@ -29,8 +29,8 @@ def destination_path(root: Path, remote_path: str, remote_parent: str) -> Path:
     _,_, rel_path = remote_path.partition(remote_parent)
     dest_str = f"{root}{rel_path}"
     dest = Path(dest_str)
-    if len(dest_str) > 218:
-        logger.warning("Local file path exceeds 218 characters: %s may become corrupted or inaccessible. Consider renaming.", dest)
+    if len(dest_str) > 218 and ".xls" in os.path.splitext(dest_str)[1]:
+        logger.warning("Local Excel file path exceeds 218 characters: %s may be inaccessible. Consider renaming.", dest)
     return dest
 
 class Downloader:
@@ -70,7 +70,6 @@ class Downloader:
                     if self.stop_event.is_set():
                         return False
                     self.stats.update_download(slot, 0)
-                    logger.debug("Downloading: %s (%s)", entry.path_display, human_size(entry.size))
                     metadata, response = self.dbx.files_download(f"rev:{entry.rev}")
                     with contextlib.closing(response):
                         if (
@@ -105,6 +104,7 @@ class Downloader:
                     tmp_path.replace(dest)
                     self.stats.increment("files_verified")
                     self.limiter.record_success()
+                    logger.debug("Downloaded: %s (%s) <%s>", entry.path_display, human_size(entry.size), entry.id)
                     return True
                 except InterruptedError:
                     return False
@@ -115,8 +115,8 @@ class Downloader:
                         self.stats.increment("rate_limit_hits")
                         self.limiter.record_rate_limit()
                     if attempt == self.config.max_retries - 1:
-                        logger.error("Failed to download %s |ID %s| after %d attempts: %s",
-                                     entry.path_display, entry.id, self.config.max_retries, error)
+                        logger.error("Failed to download %s after %d attempts: %s",
+                                     entry.path_display, self.config.max_retries, error)
                         return False
                     self.stats.increment("retries_total")
                     wait_time = exponential_backoff_with_jitter(
@@ -202,6 +202,7 @@ def run_backup(
         if not success:
             with budget_lock:
                 reserved_bytes -= entry.size
+            logger.warning("Missed: %s |%s|", entry.path_display, entry.id)
         return entry, "ok" if success else "fail"
 
     try:

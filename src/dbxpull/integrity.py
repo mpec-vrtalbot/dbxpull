@@ -25,7 +25,7 @@ def content_hash(path: Path, stop_event: Event | None = None) -> tuple[int, str]
     Dropbox hashes each 4 MiB block, then hashes the concatenated binary
     digests. An empty file has no blocks. This is not ordinary file SHA-256.
     """
-    digest = hashlib.sha256()
+    sha256 = hashlib.sha256()
     size = 0
     with path.open("rb") as source:
         while True:
@@ -35,9 +35,9 @@ def content_hash(path: Path, stop_event: Event | None = None) -> tuple[int, str]
             if not block:
                 break
             size += len(block)
-            digest.update(hashlib.sha256(block).digest())
-    return size, digest.hexdigest()
-
+            sha256.update(hashlib.sha256(block).digest())
+    # hexdigest the final result after concatenating blocks
+    return size, sha256.hexdigest()
 
 def verify_file(
     path: Path, expected_size: int, expected_hash: str | None,
